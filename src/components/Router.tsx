@@ -17,6 +17,7 @@ import NotFound from "../pages/NotFound";
 
 import StudentDashboard from "../pages/StudentDashboard";
 import StudentCourses from "../pages/StudentCourses";
+import CourseView from "../pages/CourseView";
 import StudentCertificates from "../pages/StudentCertificates";
 import StudentSchedule from "../pages/StudentSchedule";
 import StudentSettings from "../pages/StudentSettings";
@@ -85,6 +86,7 @@ const Router = () => {
         <Route path="browse" element={<BrowseCourses />} />
         <Route path="checkout" element={<Checkout />} />
         <Route path="courses" element={<StudentCourses />} />
+        <Route path="courses/:courseId" element={<CourseView />} />
         <Route path="certificates" element={<StudentCertificates />} />
         <Route path="schedule" element={<StudentSchedule />} />
         <Route path="settings" element={<StudentSettings />} />
