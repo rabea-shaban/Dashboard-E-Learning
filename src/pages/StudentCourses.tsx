@@ -56,66 +56,74 @@ const StudentCourses = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {purchases.map((purchase) => (
             <div key={purchase.id}>
-              {purchase.courses.map((course: any, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => navigate(`/student/courses/${course.id}`)}
-                  className="w-full text-left bg-white rounded-xl shadow-lg overflow-hidden mb-4 hover:shadow-xl transition group"
-                >
-                  {/* Image */}
-                  <div className="relative overflow-hidden h-48">
-                    <img
-                      src={course.image}
-                      alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
-                    />
-                    {course.videos && course.videos.length > 0 && (
-                      <div className="absolute top-3 right-3 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-                        <Play size={14} />
-                        {course.videos.length}
-                      </div>
-                    )}
-                  </div>
+              {purchase.courses.map((course: any, idx: number) => {
+                // Get courseId - try different properties
+                const courseId =
+                  course.id || course.courseId || `course_${idx}`;
+                console.log("Course object:", course);
+                console.log("Using courseId:", courseId);
 
-                  {/* Content */}
-                  <div className="p-6">
-                    <h3 className="font-bold text-gray-800 mb-2 line-clamp-2">
-                      {course.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-1">
-                      by {course.instructor}
-                    </p>
-                    <p className="text-sm text-gray-500 mb-4">
-                      {course.duration}
-                    </p>
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => navigate(`/student/courses/${courseId}`)}
+                    className="w-full text-left bg-white rounded-xl shadow-lg overflow-hidden mb-4 hover:shadow-xl transition group"
+                  >
+                    {/* Image */}
+                    <div className="relative overflow-hidden h-48">
+                      <img
+                        src={course.image}
+                        alt={course.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                      />
+                      {course.videos && course.videos.length > 0 && (
+                        <div className="absolute top-3 right-3 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                          <Play size={14} />
+                          {course.videos.length}
+                        </div>
+                      )}
+                    </div>
 
-                    {/* Video Count Badge */}
-                    {course.videos && course.videos.length > 0 && (
-                      <div className="mb-3 p-2 bg-purple-50 rounded-lg">
-                        <p className="text-sm font-semibold text-purple-700">
-                          📺 {course.videos.length} video
-                          {course.videos.length !== 1 ? "s" : ""}
+                    {/* Content */}
+                    <div className="p-6">
+                      <h3 className="font-bold text-gray-800 mb-2 line-clamp-2">
+                        {course.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-1">
+                        by {course.instructor}
+                      </p>
+                      <p className="text-sm text-gray-500 mb-4">
+                        {course.duration}
+                      </p>
+
+                      {/* Video Count Badge */}
+                      {course.videos && course.videos.length > 0 && (
+                        <div className="mb-3 p-2 bg-purple-50 rounded-lg">
+                          <p className="text-sm font-semibold text-purple-700">
+                            📺 {course.videos.length} video
+                            {course.videos.length !== 1 ? "s" : ""}
+                          </p>
+                        </div>
+                      )}
+
+                      <p className="text-purple-600 font-semibold">
+                        ${course.price}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-3">
+                        Purchased:{" "}
+                        {new Date(purchase.purchaseDate).toLocaleDateString()}
+                      </p>
+
+                      {/* Call to Action */}
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <p className="text-sm font-semibold text-purple-600 group-hover:text-purple-700">
+                          Continue Learning →
                         </p>
                       </div>
-                    )}
-
-                    <p className="text-purple-600 font-semibold">
-                      ${course.price}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-3">
-                      Purchased:{" "}
-                      {new Date(purchase.purchaseDate).toLocaleDateString()}
-                    </p>
-
-                    {/* Call to Action */}
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <p className="text-sm font-semibold text-purple-600 group-hover:text-purple-700">
-                        Continue Learning →
-                      </p>
                     </div>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           ))}
         </div>

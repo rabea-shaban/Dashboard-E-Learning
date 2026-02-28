@@ -19,7 +19,20 @@ export const purchaseService = {
   async getUserPurchases(userId: string) {
     const q = query(collection(db, "purchases"), where("userId", "==", userId));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const purchases = snapshot.docs.map((doc) => {
+      const data = { id: doc.id, ...doc.data() };
+      console.log("Retrieved purchase with courses:", data);
+      if (data.courses && Array.isArray(data.courses)) {
+        console.log("Courses array:", data.courses);
+        data.courses.forEach((course: any, idx: number) => {
+          console.log(`Course ${idx}:`, course);
+          console.log(`  - Has 'id'?`, "id" in course, course.id);
+          console.log(`  - Keys:`, Object.keys(course));
+        });
+      }
+      return data;
+    });
+    return purchases;
   },
 
   async getAllPurchases() {
