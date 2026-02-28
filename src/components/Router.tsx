@@ -85,8 +85,8 @@ const Router = () => {
         <Route index element={<StudentDashboard />} />
         <Route path="browse" element={<BrowseCourses />} />
         <Route path="checkout" element={<Checkout />} />
-        <Route path="courses" element={<StudentCourses />} />
         <Route path="courses/:courseId" element={<CourseView />} />
+        <Route path="courses" element={<StudentCourses />} />
         <Route path="certificates" element={<StudentCertificates />} />
         <Route path="schedule" element={<StudentSchedule />} />
         <Route path="settings" element={<StudentSettings />} />
