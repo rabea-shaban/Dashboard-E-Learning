@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Award, Download, Share2, Calendar, CheckCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { purchaseService } from "../services/purchase.service";
@@ -9,7 +9,6 @@ const StudentCertificates = () => {
   const { user } = useAuth();
   const [certificates, setCertificates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const certificateRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -228,7 +227,6 @@ const StudentCertificates = () => {
             >
               {/* Certificate Preview */}
               <div
-                ref={(el) => (certificateRefs.current[cert.id] = el)}
                 className="relative p-8 border-4"
                 style={{
                   background: '#f3e7ff',

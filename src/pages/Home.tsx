@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { BookOpen, Users, DollarSign, TrendingUp } from "lucide-react";
-import { courseService } from "../services/course.service";
 import { purchaseService } from "../services/purchase.service";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase";

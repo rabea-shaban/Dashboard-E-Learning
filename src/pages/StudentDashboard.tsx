@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BookOpen, Clock, Award, TrendingUp, Play, CheckCircle } from "lucide-react";
+import { BookOpen, Clock, Award, Play, CheckCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { purchaseService } from "../services/purchase.service";
 import { Link } from "react-router-dom";

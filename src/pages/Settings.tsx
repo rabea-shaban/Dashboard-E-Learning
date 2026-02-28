@@ -8,12 +8,11 @@ import {
   Globe,
   Shield,
   Trash2,
-  Edit,
   Plus,
   X,
   UserPlus,
 } from "lucide-react";
-import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
@@ -25,7 +24,6 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [users, setUsers] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<any>(null);
 
   const { register, handleSubmit, reset } = useForm();
 
