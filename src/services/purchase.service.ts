@@ -4,6 +4,8 @@ import type { Course } from "../types/types";
 
 export const purchaseService = {
   async createPurchase(userId: string, courses: Course[]) {
+    console.log("Creating purchase for user:", userId);
+    console.log("Courses to save:", courses);
     const purchase = {
       userId,
       courses: courses,
@@ -11,15 +13,23 @@ export const purchaseService = {
       purchaseDate: new Date().toISOString(),
       status: "completed",
     };
+    console.log("Purchase object:", purchase);
 
     const docRef = await addDoc(collection(db, "purchases"), purchase);
+    console.log("Purchase created with ID:", docRef.id);
     return docRef.id;
   },
 
   async getUserPurchases(userId: string) {
     const q = query(collection(db, "purchases"), where("userId", "==", userId));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const purchases = snapshot.docs.map((doc) => {
+      const data = { id: doc.id, ...doc.data() };
+      console.log("Retrieved purchase:", data);
+      return data;
+    });
+    console.log("All purchases for user:", purchases);
+    return purchases;
   },
 
   async getAllPurchases() {
