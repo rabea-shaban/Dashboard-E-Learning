@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { authService } from "../services/auth.service";
 import { userService } from "../services/user.service";
+import { toast } from "react-toastify";
 
 type FormData = {
   name: string;
@@ -31,9 +32,10 @@ export default function Register() {
       );
 
       await userService.createUserProfile(user, "student");
+      toast.success("Account created successfully");
       navigate("/");
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message || "Registration failed");
     }
   };
 

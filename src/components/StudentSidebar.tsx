@@ -14,6 +14,7 @@ import {
 import { useUserProfile } from "../hooks/useUserProfile";
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/auth.service";
+import { toast } from "react-toastify";
 
 const StudentSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -45,6 +46,7 @@ const StudentSidebar = () => {
   const navigate = useNavigate();
   const handleLogout = async () => {
     await authService.logout();
+    toast.success("Logged out successfully");
     navigate("/auth/login");
   };
 

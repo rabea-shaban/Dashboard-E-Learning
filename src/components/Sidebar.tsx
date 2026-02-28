@@ -14,6 +14,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/auth.service";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { toast } from "react-toastify";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -30,7 +31,7 @@ const Sidebar = () => {
         : profile?.role === "instructor"
           ? "Instructor"
           : "User";
-  
+
   const menuItems = [
     { icon: Home, label: "Home", path: "/dashboard" },
     { icon: BookOpen, label: "Courses", path: "/dashboard/courses" },
@@ -45,6 +46,7 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     await authService.logout();
+    toast.success("Logged out successfully");
     navigate("/auth/login");
   };
 
@@ -110,11 +112,13 @@ const Sidebar = () => {
                 </Link>
               );
             })}
-            
+
             {/* Admin Only Menu */}
             {profile?.role === "admin" && (
               <>
-                <div className={`border-t border-indigo-700/50 my-2 ${!isOpen && "lg:hidden"}`} />
+                <div
+                  className={`border-t border-indigo-700/50 my-2 ${!isOpen && "lg:hidden"}`}
+                />
                 {adminMenuItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (

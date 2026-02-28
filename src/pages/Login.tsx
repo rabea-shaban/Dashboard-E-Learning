@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { authService } from "../services/auth.service";
+import { toast } from "react-toastify"; // toast notifications
 
 type FormData = {
   email: string;
@@ -22,9 +23,17 @@ const Login = () => {
   const onSubmit = async (data: FormData) => {
     try {
       await authService.login(data.email, data.password);
+      toast.success("Logged in successfully");
       navigate("/");
     } catch (error: any) {
-      alert(error.message);
+      // show a friendly message for invalid credential errors, otherwise show whatever Firebase returns
+      if (error?.code === "auth/invalid-credential") {
+        toast.error(
+          "Invalid credentials. Please check your email and password.",
+        );
+      } else {
+        toast.error(error.message || "An error occurred during login");
+      }
     }
   };
 
