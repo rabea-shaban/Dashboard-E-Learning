@@ -32,15 +32,34 @@ const CourseView = () => {
         const purchases = await purchaseService.getUserPurchases(user.uid);
         let foundCourse: Course | null = null;
 
+        console.log("Looking for courseId:", courseId);
+        console.log("Total purchases:", purchases.length);
+
         for (const purchase of purchases) {
           if (!("courses" in purchase)) continue;
 
-          const courseInPurchase = (purchase.courses as any[]).find(
-            (c: any) => c.id === courseId,
+          const courses = (purchase as any).courses as any[];
+          console.log(
+            "Checking purchase ",
+            purchase.id,
+            "with",
+            courses?.length,
+            "courses",
           );
+          const courseInPurchase = courses.find((c: any) => {
+            console.log(
+              "Comparing courseId:",
+              courseId,
+              "with course:",
+              c.id,
+              c.courseId,
+            );
+            return c.id === courseId || c.courseId === courseId;
+          });
           if (courseInPurchase) {
             foundCourse = courseInPurchase;
             setHasAccess(true);
+            console.log("Found course!", courseInPurchase.title);
             break;
           }
         }

@@ -4,15 +4,27 @@ import type { Course } from "../types/types";
 
 export const purchaseService = {
   async createPurchase(userId: string, courses: Course[]) {
+    // Ensure courses have explicit courseId field for reliable lookup
+    const coursesWithCourseId = courses.map((course) => ({
+      ...course,
+      courseId: course.id, // Explicitly store the ID as courseId for backup
+    }));
+
     const purchase = {
       userId,
-      courses: courses,
+      courses: coursesWithCourseId,
+      courseIds: courses.map((c) => c.id), // Also store just the IDs for quick lookups
       total: courses.reduce((sum, c) => sum + c.price, 0),
       purchaseDate: new Date().toISOString(),
       status: "completed",
     };
 
     const docRef = await addDoc(collection(db, "purchases"), purchase);
+    console.log("Purchase created with ID:", docRef.id);
+    console.log(
+      "Courses saved:",
+      coursesWithCourseId.map((c) => `${c.title} (${c.id})`),
+    );
     return docRef.id;
   },
 
@@ -57,10 +69,17 @@ export const purchaseService = {
 
   async hasPurchasedCourse(userId: string, courseId: string) {
     const purchases = await this.getUserPurchases(userId);
-    return purchases.some((purchase: any) =>
-      purchase.courses.some(
+    const hasPurchase = purchases.some((purchase: any) => {
+      // Check if courseId is in courseIds array (fastest lookup)
+      if (purchase.courseIds?.includes(courseId)) {
+        return true;
+      }
+      // Fallback: check courses array with multiple possible id fields
+      return purchase.courses?.some(
         (c: any) => c.id === courseId || c.courseId === courseId,
-      ),
-    );
+      );
+    });
+    console.log("hasPurchasedCourse(", courseId, ") =", hasPurchase);
+    return hasPurchase;
   },
 };
