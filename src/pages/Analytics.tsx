@@ -54,7 +54,14 @@ const Analytics = () => {
     totalEnrollments: 0,
   });
 
-  const COLORS = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
+  const COLORS = [
+    "#6366f1",
+    "#8b5cf6",
+    "#ec4899",
+    "#f59e0b",
+    "#10b981",
+    "#3b82f6",
+  ];
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -67,13 +74,13 @@ const Analytics = () => {
         }));
         const usersSnapshot = await getDocs(collection(db, "users"));
         const students = usersSnapshot.docs.filter(
-          (doc) => doc.data().role === "student"
+          (doc) => doc.data().role === "student",
         );
 
         // Calculate comprehensive stats
         const totalRevenue = purchases.reduce(
           (sum: number, p: any) => sum + (p.total || 0),
-          0
+          0,
         );
         const totalOrders = purchases.length;
         const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
@@ -81,7 +88,7 @@ const Analytics = () => {
         const totalCourses = courses.length;
         const totalEnrollments = purchases.reduce(
           (sum: number, p: any) => sum + (p.courses?.length || 0),
-          0
+          0,
         );
         const avgCoursesPerStudent =
           totalStudents > 0 ? totalEnrollments / totalStudents : 0;
@@ -101,7 +108,9 @@ const Analytics = () => {
         const categoryMap: any = {};
         purchases.forEach((purchase: any) => {
           purchase.courses?.forEach((course: any) => {
-            const fullCourse = courses.find((c: any) => c.id === course.courseId);
+            const fullCourse = courses.find(
+              (c: any) => c.id === course.courseId,
+            );
             if (fullCourse) {
               const category = (fullCourse as any).category || "Other";
               categoryMap[category] = (categoryMap[category] || 0) + 1;
@@ -119,7 +128,9 @@ const Analytics = () => {
         const categoryRevenueMap: any = {};
         purchases.forEach((purchase: any) => {
           purchase.courses?.forEach((course: any) => {
-            const fullCourse = courses.find((c: any) => c.id === course.courseId);
+            const fullCourse = courses.find(
+              (c: any) => c.id === course.courseId,
+            );
             if (fullCourse) {
               const category = (fullCourse as any).category || "Other";
               categoryRevenueMap[category] =
@@ -128,10 +139,12 @@ const Analytics = () => {
           });
         });
 
-        const categoryRevenueData = Object.keys(categoryRevenueMap).map((key) => ({
-          category: key,
-          revenue: categoryRevenueMap[key],
-        }));
+        const categoryRevenueData = Object.keys(categoryRevenueMap).map(
+          (key) => ({
+            category: key,
+            revenue: categoryRevenueMap[key],
+          }),
+        );
         setCategoryRevenue(categoryRevenueData);
 
         // Revenue by month
@@ -198,7 +211,9 @@ const Analytics = () => {
         const instructorMap: any = {};
         purchases.forEach((purchase: any) => {
           purchase.courses?.forEach((course: any) => {
-            const fullCourse = courses.find((c: any) => c.id === course.courseId);
+            const fullCourse = courses.find(
+              (c: any) => c.id === course.courseId,
+            );
             if (fullCourse) {
               const instructor = (fullCourse as any).instructor || "Unknown";
               if (!instructorMap[instructor]) {
@@ -229,7 +244,7 @@ const Analytics = () => {
           revenue: instructorMap[key].revenue,
           courses: instructorMap[key].courses,
           avgEnrollment: Math.round(
-            instructorMap[key].enrollments / instructorMap[key].courses
+            instructorMap[key].enrollments / instructorMap[key].courses,
           ),
         }));
         setInstructorPerformance(instructorData);
@@ -287,7 +302,9 @@ const Analytics = () => {
             <Users size={32} />
             <TrendingUp size={24} />
           </div>
-          <h3 className="text-sm font-medium opacity-90 mb-1">Total Students</h3>
+          <h3 className="text-sm font-medium opacity-90 mb-1">
+            Total Students
+          </h3>
           <p className="text-3xl font-bold">{stats.totalStudents}</p>
         </div>
 
@@ -306,7 +323,9 @@ const Analytics = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
           <div className="flex items-center gap-3 mb-2">
             <DollarSign className="text-blue-500" size={24} />
-            <h3 className="text-sm font-medium text-gray-600">Avg Order Value</h3>
+            <h3 className="text-sm font-medium text-gray-600">
+              Avg Order Value
+            </h3>
           </div>
           <p className="text-2xl font-bold text-gray-800">
             ${stats.avgOrderValue.toFixed(2)}
@@ -316,7 +335,9 @@ const Analytics = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
           <div className="flex items-center gap-3 mb-2">
             <Target className="text-green-500" size={24} />
-            <h3 className="text-sm font-medium text-gray-600">Conversion Rate</h3>
+            <h3 className="text-sm font-medium text-gray-600">
+              Conversion Rate
+            </h3>
           </div>
           <p className="text-2xl font-bold text-gray-800">
             {stats.conversionRate}%
@@ -326,7 +347,9 @@ const Analytics = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
           <div className="flex items-center gap-3 mb-2">
             <Award className="text-purple-500" size={24} />
-            <h3 className="text-sm font-medium text-gray-600">Total Enrollments</h3>
+            <h3 className="text-sm font-medium text-gray-600">
+              Total Enrollments
+            </h3>
           </div>
           <p className="text-2xl font-bold text-gray-800">
             {stats.totalEnrollments}
@@ -336,7 +359,9 @@ const Analytics = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
           <div className="flex items-center gap-3 mb-2">
             <Clock className="text-orange-500" size={24} />
-            <h3 className="text-sm font-medium text-gray-600">Avg Courses/Student</h3>
+            <h3 className="text-sm font-medium text-gray-600">
+              Avg Courses/Student
+            </h3>
           </div>
           <p className="text-2xl font-bold text-gray-800">
             {stats.avgCoursesPerStudent.toFixed(1)}
@@ -426,7 +451,7 @@ const Analytics = () => {
                 fill="#8884d8"
                 dataKey="value"
               >
-                {categoryData.map((entry, index) => (
+                {categoryData.map((_, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
