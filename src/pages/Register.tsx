@@ -1,121 +1,116 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { authService } from "../services/auth.service";
+import { userService } from "../services/user.service";
 
-const Register = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+type FormData = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
+export default function Register() {
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>();
+
+  const password = watch("password");
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      const user = await authService.register(
+        data.name,
+        data.email,
+        data.password,
+      );
+
+      await userService.createUserProfile(user, "student");
+      navigate("/");
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-800 to-indigo-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
-            <p className="text-gray-600">Join our E-Learning platform</p>
-          </div>
+          <h1 className="text-3xl font-bold text-center mb-6">
+            Create Account
+          </h1>
 
-          <form className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Enter your full name"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                />
-              </div>
-            </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Name */}
+            <input
+              {...register("name", { required: "Name required" })}
+              placeholder="Full name"
+              className="w-full p-3 border rounded"
+            />
+            {errors.name && (
+              <p className="text-red-500">{errors.name.message}</p>
+            )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                />
-              </div>
-            </div>
+            {/* Email */}
+            <input
+              {...register("email", { required: "Email required" })}
+              placeholder="Email"
+              className="w-full p-3 border rounded"
+            />
+            {errors.email && (
+              <p className="text-red-500">{errors.email.message}</p>
+            )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
+            {/* Password */}
+            <input
+              {...register("password", {
+                required: "Password required",
+                minLength: { value: 6, message: "Min 6 characters" },
+              })}
+              type="password"
+              placeholder="Password"
+              className="w-full p-3 border rounded"
+            />
+            {errors.password && (
+              <p className="text-red-500">{errors.password.message}</p>
+            )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
+            {/* Confirm Password */}
+            <input
+              {...register("confirmPassword", {
+                validate: (value) =>
+                  value === password || "Passwords not match",
+              })}
+              type="password"
+              placeholder="Confirm password"
+              className="w-full p-3 border rounded"
+            />
+            {errors.confirmPassword && (
+              <p className="text-red-500">{errors.confirmPassword.message}</p>
+            )}
 
-            <div className="flex items-start">
-              <input type="checkbox" className="w-4 h-4 mt-1 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
-              <span className="ml-2 text-sm text-gray-600">
-                I agree to the{" "}
-                <a href="#" className="text-indigo-600 hover:text-indigo-700 font-medium">
-                  Terms and Conditions
-                </a>
-              </span>
-            </div>
-
+            {/* Submit */}
             <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl"
+              disabled={isSubmitting}
+              className="w-full bg-indigo-600 text-white p-3 rounded"
             >
-              Create Account
+              {isSubmitting ? "Creating..." : "Create Account"}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Already have an account?{" "}
-              <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold">
-                Sign In
-              </Link>
-            </p>
-          </div>
+          <p className="mt-4 text-center">
+            Already have account?{" "}
+            <a href="/auth/login" className="text-indigo-600">
+              Login
+            </a>
+          </p>
         </div>
       </div>
     </div>
   );
-};
-
-export default Register;
+}
