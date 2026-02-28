@@ -1,30 +1,48 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Plus, Edit, Trash2, X, Search, Users } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  X,
+  Search,
+  Users,
+  Video as VideoIcon,
+} from "lucide-react";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 import { courseService } from "../services/course.service";
 import { purchaseService } from "../services/purchase.service";
-import type { Course } from "../types/types";
+import type { Course, Video } from "../types/types";
 
 const Courses = () => {
   const [courses, setCourses] = useState<Course[]>([]);
-  const [enrollmentCounts, setEnrollmentCounts] = useState<{ [key: string]: number }>({});
+  const [enrollmentCounts, setEnrollmentCounts] = useState<{
+    [key: string]: number;
+  }>({});
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [courseVideos, setCourseVideos] = useState<Video[]>([]);
+  const [videoFormData, setVideoFormData] = useState({
+    title: "",
+    url: "",
+    duration: "",
+  });
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<Omit<Course, "id">>();
 
   const handleOpenModal = (course?: Course) => {
     if (course) {
       setEditingCourse(course);
+      setCourseVideos(course.videos || []);
       reset({
         title: course.title,
         description: course.description,
@@ -36,6 +54,7 @@ const Courses = () => {
       });
     } else {
       setEditingCourse(null);
+      setCourseVideos([]);
       reset({
         title: "",
         description: "",
@@ -52,15 +71,38 @@ const Courses = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingCourse(null);
+    setCourseVideos([]);
+    setVideoFormData({ title: "", url: "", duration: "" });
     reset();
+  };
+
+  const handleAddVideo = () => {
+    if (videoFormData.title && videoFormData.url && videoFormData.duration) {
+      const newVideo: Video = {
+        id: Date.now().toString(),
+        title: videoFormData.title,
+        url: videoFormData.url,
+        duration: videoFormData.duration,
+      };
+      setCourseVideos([...courseVideos, newVideo]);
+      setVideoFormData({ title: "", url: "", duration: "" });
+    }
+  };
+
+  const handleRemoveVideo = (videoId: string) => {
+    setCourseVideos(courseVideos.filter((v) => v.id !== videoId));
   };
 
   const onSubmit = async (data: Omit<Course, "id">) => {
     try {
+      const courseData = {
+        ...data,
+        videos: courseVideos,
+      };
       if (editingCourse) {
-        await courseService.update(editingCourse.id, data);
+        await courseService.update(editingCourse.id, courseData);
       } else {
-        await courseService.create(data);
+        await courseService.create(courseData);
       }
       handleCloseModal();
     } catch (error: any) {
@@ -168,6 +210,9 @@ const Courses = () => {
                   Duration
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                  Videos
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                   Students
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
@@ -205,6 +250,14 @@ const Courses = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-gray-700">{course.duration}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <VideoIcon size={18} className="text-indigo-600" />
+                      <span className="font-semibold text-gray-800">
+                        {course.videos?.length || 0}
+                      </span>
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <Users size={18} className="text-indigo-600" />
@@ -393,6 +446,113 @@ const Courses = () => {
                   <p className="text-red-500 text-sm mt-1">
                     {errors.image.message}
                   </p>
+                )}
+              </div>
+
+              {/* Videos Section */}
+              <div className="border-t pt-6 mt-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Course Videos
+                </h3>
+
+                {/* Add Video Form */}
+                <div className="space-y-3 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Video Title
+                    </label>
+                    <input
+                      type="text"
+                      value={videoFormData.title}
+                      onChange={(e) =>
+                        setVideoFormData({
+                          ...videoFormData,
+                          title: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                      placeholder="e.g., Introduction to JavaScript"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Video URL
+                    </label>
+                    <input
+                      type="url"
+                      value={videoFormData.url}
+                      onChange={(e) =>
+                        setVideoFormData({
+                          ...videoFormData,
+                          url: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                      placeholder="https://example.com/video.mp4"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Duration
+                    </label>
+                    <input
+                      type="text"
+                      value={videoFormData.duration}
+                      onChange={(e) =>
+                        setVideoFormData({
+                          ...videoFormData,
+                          duration: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                      placeholder="e.g., 45 min"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAddVideo}
+                    className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition"
+                  >
+                    <Plus size={18} />
+                    Add Video
+                  </button>
+                </div>
+
+                {/* Videos List */}
+                {courseVideos.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-600">
+                      {courseVideos.length} video(s) added
+                    </p>
+                    {courseVideos.map((video) => (
+                      <div
+                        key={video.id}
+                        className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200"
+                      >
+                        <div className="flex items-center gap-3">
+                          <VideoIcon size={18} className="text-indigo-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">
+                              {video.title}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              {video.duration}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveVideo(video.id)}
+                          className="p-1 text-red-600 hover:bg-red-50 rounded transition"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
 

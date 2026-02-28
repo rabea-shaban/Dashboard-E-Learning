@@ -12,7 +12,14 @@ export type FormData = {
   role: string;
 };
 
-export type Course= {
+export type Video = {
+  id: string;
+  title: string;
+  url: string;
+  duration: string;
+};
+
+export type Course = {
   id: string;
   title: string;
   description: string;
@@ -21,4 +28,5 @@ export type Course= {
   duration: string;
   category: string;
   image: string;
-}
+  videos?: Video[];
+};

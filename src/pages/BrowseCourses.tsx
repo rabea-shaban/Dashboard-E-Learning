@@ -17,13 +17,22 @@ const BrowseCourses = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const categories = ["All Courses", "Development", "Design", "Data Science", "Business"];
+  const categories = [
+    "All Courses",
+    "Development",
+    "Design",
+    "Data Science",
+    "Business",
+  ];
 
   const handleBuy = async (course: Course) => {
     if (!user) return;
 
-    const alreadyPurchased = await purchaseService.hasPurchasedCourse(user.uid, course.id);
-    
+    const alreadyPurchased = await purchaseService.hasPurchasedCourse(
+      user.uid,
+      course.id,
+    );
+
     if (alreadyPurchased) {
       Swal.fire({
         icon: "info",
@@ -39,8 +48,12 @@ const BrowseCourses = () => {
   };
 
   const filteredCourses = courses.filter((course) => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "All Courses" || course.category === selectedCategory;
+    const matchesSearch = course.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "All Courses" ||
+      course.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -52,14 +65,19 @@ const BrowseCourses = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Browse Courses</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          Browse Courses
+        </h1>
         <p className="text-gray-600">Discover and enroll in new courses</p>
       </div>
 
       {/* Search */}
       <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            size={20}
+          />
           <input
             type="text"
             placeholder="Search courses..."
@@ -109,14 +127,26 @@ const BrowseCourses = () => {
               <h3 className="font-bold text-gray-800 mb-2 line-clamp-2 h-12">
                 {course.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-3">by {course.instructor}</p>
+              <p className="text-sm text-gray-600 mb-3">
+                by {course.instructor}
+              </p>
               <p className="text-sm text-gray-500 mb-3">{course.duration}</p>
+
+              {/* Video Count Badge */}
+              {course.videos && course.videos.length > 0 && (
+                <div className="mb-3 p-2 bg-purple-50 rounded-lg">
+                  <p className="text-sm font-semibold text-purple-700">
+                    📺 {course.videos.length} video
+                    {course.videos.length !== 1 ? "s" : ""}
+                  </p>
+                </div>
+              )}
 
               <div className="flex items-center justify-between pt-3 border-t border-gray-200">
                 <span className="text-2xl font-bold text-purple-600">
                   ${course.price}
                 </span>
-                <button 
+                <button
                   onClick={() => handleBuy(course)}
                   className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
                 >
