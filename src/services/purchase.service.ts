@@ -6,14 +6,7 @@ export const purchaseService = {
   async createPurchase(userId: string, courses: Course[]) {
     const purchase = {
       userId,
-      courses: courses.map(c => ({
-        courseId: c.id,
-        title: c.title,
-        price: c.price,
-        instructor: c.instructor,
-        image: c.image,
-        duration: c.duration,
-      })),
+      courses: courses,
       total: courses.reduce((sum, c) => sum + c.price, 0),
       purchaseDate: new Date().toISOString(),
       status: "completed",
@@ -24,24 +17,25 @@ export const purchaseService = {
   },
 
   async getUserPurchases(userId: string) {
-    const q = query(
-      collection(db, "purchases"),
-      where("userId", "==", userId)
-    );
+    const q = query(collection(db, "purchases"), where("userId", "==", userId));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   },
 
   async getAllPurchases() {
     const snapshot = await getDocs(collection(db, "purchases"));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   },
 
   async getCourseEnrollmentCount(courseId: string) {
     const purchases = await this.getAllPurchases();
     let count = 0;
     purchases.forEach((purchase: any) => {
-      if (purchase.courses?.some((c: any) => c.courseId === courseId)) {
+      if (
+        purchase.courses?.some(
+          (c: any) => c.id === courseId || c.courseId === courseId,
+        )
+      ) {
         count++;
       }
     });
@@ -50,8 +44,10 @@ export const purchaseService = {
 
   async hasPurchasedCourse(userId: string, courseId: string) {
     const purchases = await this.getUserPurchases(userId);
-    return purchases.some((purchase: any) => 
-      purchase.courses.some((c: any) => c.courseId === courseId)
+    return purchases.some((purchase: any) =>
+      purchase.courses.some(
+        (c: any) => c.id === courseId || c.courseId === courseId,
+      ),
     );
   },
 };

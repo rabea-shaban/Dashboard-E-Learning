@@ -28,20 +28,7 @@ const CourseView = () => {
       if (!user || !courseId) return;
 
       try {
-        // Check if user has access to this course
-        const hasPurchased = await purchaseService.hasPurchasedCourse(
-          user.uid,
-          courseId,
-        );
-        setHasAccess(hasPurchased);
-
-        if (!hasPurchased) {
-          setLoading(false);
-          return;
-        }
-
-        // Get course details - this would require updating the service or using courseService
-        // For now, we'll fetch from purchases
+        // Fetch user purchases to find the course
         const purchases = await purchaseService.getUserPurchases(user.uid);
         let foundCourse: Course | null = null;
 
@@ -52,15 +39,20 @@ const CourseView = () => {
           );
           if (courseInPurchase) {
             foundCourse = courseInPurchase;
+            setHasAccess(true);
             break;
           }
         }
 
-        if (foundCourse) {
-          setCourse(foundCourse);
-          if (foundCourse.videos && foundCourse.videos.length > 0) {
-            setSelectedVideo(foundCourse.videos[0]);
-          }
+        if (!foundCourse) {
+          setHasAccess(false);
+          setLoading(false);
+          return;
+        }
+
+        setCourse(foundCourse);
+        if (foundCourse.videos && foundCourse.videos.length > 0) {
+          setSelectedVideo(foundCourse.videos[0]);
         }
 
         // Load watched videos from localStorage
