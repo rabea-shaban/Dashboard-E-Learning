@@ -35,7 +35,6 @@ const Courses = () => {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm<Omit<Course, "id">>();
 
